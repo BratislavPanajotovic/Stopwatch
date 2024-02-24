@@ -1,23 +1,30 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState, useEffect, useRef } from "react";
+import "./App.css";
 
 function App() {
+  const [time, setTime] = useState(0);
+
+  let id = useRef();
+
+  useEffect(() => {
+    // Kod sporednog efekta ovde
+    id.current = setInterval(() => {
+      setTime((prev) => prev + 1);
+    }, 1000);
+
+    return () => clearInterval(id.current);
+
+    // Kod za čišćenje ovde (opciono)
+  }, []);
+
+  const incrementTime = () => {};
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>{time}</h1>
+      <button onClick={incrementTime}>Start</button>
+      <button onClick={clearInterval()}>Pause</button>
+      <button>Reset</button>
     </div>
   );
 }
