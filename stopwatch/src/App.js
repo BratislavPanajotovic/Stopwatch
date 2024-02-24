@@ -3,28 +3,36 @@ import "./App.css";
 
 function App() {
   const [time, setTime] = useState(0);
+  const [isActive, setIsActive] = useState(false);
+  let interval = null;
 
-  let id = useRef();
+  const startTimer = () => {
+    if (isActive && time == 0) {
+      interval = setInterval(() => {
+        setTime((prev) => prev + 1);
+      }, 1000);
+    }
+    // } else if (!isActive && time > 0) {
+    // }
+  };
 
   useEffect(() => {
-    // Kod sporednog efekta ovde
-    id.current = setInterval(() => {
-      setTime((prev) => prev + 1);
-    }, 1000);
-
-    return () => clearInterval(id.current);
-
-    // Kod za čišćenje ovde (opciono)
-  }, []);
-
-  const incrementTime = () => {};
+    startTimer();
+    return () => clearInterval(interval);
+  }, [isActive]);
 
   return (
     <div className="App">
       <h1>{time}</h1>
-      <button onClick={incrementTime}>Start</button>
-      <button onClick={clearInterval()}>Pause</button>
-      <button>Reset</button>
+      <button onClick={() => setIsActive(!isActive)}>Start</button>
+      <button onClick={() => setIsActive(isActive == false)}>Pause</button>
+      <button
+        onClick={() =>
+          setIsActive(isActive == false) && setTime((prev) => prev - prev)
+        }
+      >
+        Reset
+      </button>
     </div>
   );
 }
