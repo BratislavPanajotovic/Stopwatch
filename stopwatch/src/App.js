@@ -1,38 +1,73 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import "./App.css";
 
 function App() {
   const [time, setTime] = useState(0);
   const [isActive, setIsActive] = useState(false);
-  let interval = null;
+  const [buttonText, setButtonText] = useState("Start");
 
   const startTimer = () => {
-    if (isActive && time == 0) {
-      interval = setInterval(() => {
+    if (isActive) {
+      const intervalId = setInterval(() => {
         setTime((prev) => prev + 1);
       }, 1000);
+      return intervalId; // Return the interval ID
     }
-    // } else if (!isActive && time > 0) {
-    // }
+    return null;
+  };
+
+  const pauseTimer = () => {
+    setIsActive(false);
+    setButtonText("Continue");
+  };
+
+  const resetTimer = () => {
+    setIsActive(false);
+    setTime(0);
+    setButtonText("Start");
+  };
+
+  const handleStartContinueClick = () => {
+    setIsActive(!isActive);
+    if (!isActive) {
+      setButtonText("Start");
+    } else {
+      setButtonText("Continue");
+      if (time > 0) {
+        const intervalId = startTimer();
+        return () => clearInterval(intervalId);
+      }
+    }
   };
 
   useEffect(() => {
-    startTimer();
-    return () => clearInterval(interval);
+    let intervalId;
+
+    if (isActive) {
+      intervalId = startTimer();
+    }
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
   }, [isActive]);
 
   return (
     <div className="App">
       <h1>{time}</h1>
-      <button onClick={() => setIsActive(!isActive)}>Start</button>
-      <button onClick={() => setIsActive(isActive == false)}>Pause</button>
       <button
-        onClick={() =>
-          setIsActive(isActive == false) && setTime((prev) => prev - prev)
-        }
+        className="start"
+        onClick={handleStartContinueClick}
+        disabled={isActive}
       >
-        Reset
+        {buttonText}
       </button>
+      <button className="pause" onClick={pauseTimer} disabled={!isActive}>
+        Pause
+      </button>
+      <button onClick={resetTimer}>Reset</button>
     </div>
   );
 }
